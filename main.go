@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 
+	sonos "github.com/ianr0bkny/go-sonos"
 	"github.com/ianr0bkny/go-sonos/ssdp"
 )
 
@@ -17,7 +18,7 @@ func main() {
 	//  eth0 := Network device to query for UPnP devices
 	// 11209 := Free local port for discovery replies
 	// false := Do not subscribe for asynchronous updates
-	mgr.Discover("eth0", "11209", false)
+	mgr.Discover("en0", "11209", false)
 
 	// SericeQueryTerms
 	// A map of service keys to minimum required version
@@ -27,9 +28,15 @@ func main() {
 
 	// Look for the service keys in qry in the database of discovered devices
 	result := mgr.QueryServices(qry)
-	if dev_list, has := result["schemas-upnp-org-MusicServices"]; has {
-		for _, dev := range dev_list {
+	if devList, has := result["schemas-upnp-org-MusicServices"]; has {
+		for _, dev := range devList {
 			log.Printf("%s %s %s %s %s\n", dev.Product(), dev.ProductVersion(), dev.Name(), dev.Location(), dev.UUID())
+			s := sonos.Connect(dev, nil, sonos.SVC_CONTENT_DIRECTORY|sonos.SVC_AV_TRANSPORT)
+
+			if err := s.Stop(0); nil != err {
+				log.Println(err)
+				panic(err)
+			}
 		}
 	}
 	mgr.Close()

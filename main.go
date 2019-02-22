@@ -34,7 +34,6 @@ func main() {
 			s := sonos.Connect(dev, nil, sonos.SVC_CONTENT_DIRECTORY|sonos.SVC_AV_TRANSPORT)
 
 			if err := s.Stop(0); nil != err {
-				log.Println(err)
 				panic(err)
 			}
 		}

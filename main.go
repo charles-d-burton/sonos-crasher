@@ -1,42 +1,21 @@
+// Copyright © 2019 NAME HERE <EMAIL ADDRESS>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package main
 
-import (
-	"log"
+import "sonos-crasher/cmd"
 
-	sonos "github.com/ianr0bkny/go-sonos"
-	"github.com/ianr0bkny/go-sonos/ssdp"
-)
-
-// This code identifies UPnP devices on the netork that support the
-// MusicServices API.
 func main() {
-	log.Print("go-sonos example discovery\n")
-
-	mgr := ssdp.MakeManager()
-
-	// Discover()
-	//  eth0 := Network device to query for UPnP devices
-	// 11209 := Free local port for discovery replies
-	// false := Do not subscribe for asynchronous updates
-	mgr.Discover("en0", "11209", false)
-
-	// SericeQueryTerms
-	// A map of service keys to minimum required version
-	qry := ssdp.ServiceQueryTerms{
-		ssdp.ServiceKey("schemas-upnp-org-MusicServices"): -1,
-	}
-
-	// Look for the service keys in qry in the database of discovered devices
-	result := mgr.QueryServices(qry)
-	if devList, has := result["schemas-upnp-org-MusicServices"]; has {
-		for _, dev := range devList {
-			log.Printf("%s %s %s %s %s\n", dev.Product(), dev.ProductVersion(), dev.Name(), dev.Location(), dev.UUID())
-			s := sonos.Connect(dev, nil, sonos.SVC_CONTENT_DIRECTORY|sonos.SVC_AV_TRANSPORT)
-
-			if err := s.Stop(0); nil != err {
-				panic(err)
-			}
-		}
-	}
-	mgr.Close()
+	cmd.Execute()
 }
